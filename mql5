@@ -1,0 +1,102 @@
+/*
+Program Name: Cycle Sniper ATR Fibo Channels Multi Timeframe
+Developer's Site: forexroboteasy.com
+Development Name: Forex Robot Easy Team
+*/
+
+// Define input parameters
+input bool useATRLevels = true; // Option to choose between ATR Levels or Median Line
+input bool useMedianLine = false; // If Median Line is selected, the indicator should draw arrows when the slope of the median line changes
+input int atrLevel1 = 1; // User-selected ATR Level Line 1
+input int atrLevel2 = 2; // User-selected ATR Level Line 2
+input int atrLevel3 = 3; // User-selected ATR Level Line 3
+
+// Define global variables
+bool arrowUp = false; // Flag to track if arrow should be drawn up
+bool arrowDown = false; // Flag to track if arrow should be drawn down
+bool arrowUpHistory = false; // Flag to track arrow history up
+bool arrowDownHistory = false; // Flag to track arrow history down
+
+// Define init function
+int OnInit()
+{
+    return(INIT_SUCCEEDED);
+}
+
+// Define deinit function
+void OnDeinit(const int reason)
+{
+    // Clean up any resources if necessary
+}
+
+// Define start function
+void OnStart()
+{
+    // Check if ATR Levels or Median Line should be used
+    if (useATRLevels)
+    {
+        // Check if price hits user-selected ATR Level Lines
+        if (Close[0] >= iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel1)
+        {
+            arrowUp = true;
+        }
+        else if (Close[0] <= -iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel1)
+        {
+            arrowDown = true;
+        }
+        else if (Close[0] >= iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel2)
+        {
+            arrowUp = true;
+        }
+        else if (Close[0] <= -iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel2)
+        {
+            arrowDown = true;
+        }
+        else if (Close[0] >= iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel3)
+        {
+            arrowUp = true;
+        }
+        else if (Close[0] <= -iATR(Symbol(), PERIOD_CURRENT, 14, 0) * atrLevel3)
+        {
+            arrowDown = true;
+        }
+    }
+    else if (useMedianLine)
+    {
+        // Check if the slope of the median line changes
+        if (iMA(NULL, PERIOD_CURRENT, 14, 0, MODE_SMA, PRICE_MEDIAN, 1) > iMA(NULL, PERIOD_CURRENT, 14, 0, MODE_SMA, PRICE_MEDIAN, 2))
+        {
+            arrowUp = true;
+        }
+        else if (iMA(NULL, PERIOD_CURRENT, 14, 0, MODE_SMA, PRICE_MEDIAN, 1) < iMA(NULL, PERIOD_CURRENT, 14, 0, MODE_SMA, PRICE_MEDIAN, 2))
+        {
+            arrowDown = true;
+        }
+    }
+
+    // Check if arrow should be drawn up or down
+    if (arrowUp)
+    {
+        // Draw arrow up
+        arrowUpHistory = true;
+        arrowDownHistory = false;
+        arrowUp = false;
+    }
+    else if (arrowDown)
+    {
+        // Draw arrow down
+        arrowUpHistory = false;
+        arrowDownHistory = true;
+        arrowDown = false;
+    }
+
+    // Print arrow history
+    if (arrowUpHistory)
+    {
+        Print('Arrow up history');
+    }
+    else if (arrowDownHistory)
+    {
+        Print('Arrow down history');
+    }
+}
